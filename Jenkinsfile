@@ -6,6 +6,17 @@ pipeline {
     }
 
     stages {
+        stage('Checkout Source Code') {
+            steps {
+                echo '🔄 Checking out source code...'
+                // Cách 1: Nếu dùng Freestyle hoặc Multibranch
+                checkout scm
+
+                // Hoặc cách 2 (tùy bạn chọn):
+                // git branch: 'main', url: 'https://github.com/congnam101/flask-mysql-app'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo '🚀 Building Docker image...'
