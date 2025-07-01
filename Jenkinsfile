@@ -9,11 +9,13 @@ pipeline {
         stage('Checkout Source Code') {
             steps {
                 echo '🔄 Checking out source code...'
-                // Cách 1: Nếu dùng Freestyle hoặc Multibranch
+                // Bạn có thể chọn 1 trong 2 cách sau:
+
+                // Cách 1: Nếu đã cấu hình `SCM` trong Pipeline Job
                 checkout scm
 
-                // Hoặc cách 2 (tùy bạn chọn):
-                // git branch: 'main', url: 'https://github.com/congnam101/flask-mysql-app'
+                // Hoặc nếu chạy trực tiếp:
+                // git branch: 'main', url: 'https://github.com/congnam101/flask-mysql-app.git'
             }
         }
 
