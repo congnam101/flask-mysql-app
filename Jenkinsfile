@@ -24,9 +24,8 @@ pipeline {
             steps {
                 echo '🛑 Stopping existing containers...'
                 sh '''
-                    if docker-compose ps -q | grep -q .; then
-                        docker-compose down
-                    fi
+                    echo "📦 Dừng và xóa container cũ (nếu có)..."
+                    docker-compose down --remove-orphans || echo "Không có container cũ để dừng."
                 '''
             }
         }
