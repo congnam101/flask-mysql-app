@@ -9,13 +9,7 @@ pipeline {
         stage('Checkout Source Code') {
             steps {
                 echo '🔄 Checking out source code...'
-                // Bạn có thể chọn 1 trong 2 cách sau:
-
-                // Cách 1: Nếu đã cấu hình `SCM` trong Pipeline Job
                 checkout scm
-
-                // Hoặc nếu chạy trực tiếp:
-                // git branch: 'main', url: 'https://github.com/congnam101/flask-mysql-app.git'
             }
         }
 
@@ -30,8 +24,8 @@ pipeline {
             steps {
                 echo '🛑 Stopping existing containers...'
                 sh '''
-                    if docker compose ps -q | grep -q .; then
-                        docker compose down
+                    if docker-compose ps -q | grep -q .; then
+                        docker-compose down
                     fi
                 '''
             }
@@ -40,7 +34,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 echo '🚢 Deploying application...'
-                sh 'docker compose up -d'
+                sh 'docker-compose up -d'
             }
         }
 
