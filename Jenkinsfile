@@ -1,27 +1,31 @@
 pipeline {
     agent any
+
+    environment {
+        DOCKER_IMAGE = "flask_app"
+    }
+
     stages {
-        stage('Clone') {
+        stage('Clone Source') {
             steps {
-                git 'https://github.com/YOUR-USERNAME/flask-mysql-app.git'
+                git 'https://github.com/congnam101/flask-mysql-app.git'
             }
         }
-        stage('Backup Source') {
-            steps {
-                sh './backup.sh'
-            }
-        }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("flask-mysql-app:${env.BUILD_NUMBER}")
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                 }
             }
         }
-        stage('Run with Docker Compose') {
+
+        stage('Deploy with Docker Compose') {
             steps {
+                sh 'docker-compose down'
                 sh 'docker-compose up -d --build'
             }
         }
     }
 }
+
