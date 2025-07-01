@@ -24,8 +24,13 @@ pipeline {
             steps {
                 echo '🛑 Stopping existing containers...'
                 sh '''
-                    echo "📦 Dừng và xóa container cũ (nếu có)..."
-                    docker-compose down --remove-orphans || echo "Không có container cũ để dừng."
+                    echo "📦 Dừng container docker-compose (nếu có)..."
+                    docker-compose down --remove-orphans || echo "Không có container docker-compose nào."
+
+                    echo "🧹 Xóa container bị trùng tên (nếu tồn tại)..."
+                    docker rm -f jenkins || true
+                    docker rm -f flask_web || true
+                    docker rm -f flask_db || true
                 '''
             }
         }
