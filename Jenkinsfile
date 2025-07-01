@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Source') {
             steps {
-                git 'https://github.com/congnam101/flask-mysql-app.git'
+                 git branch: 'main', url: 'https://github.com/congnam101/flask-mysql-app.git'
             }
         }
 
