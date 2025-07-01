@@ -2,54 +2,49 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "flask_app"
-        COMPOSE_FILE = "docker-compose.yml"
+        DOCKER_BUILDKIT = 1
     }
 
     stages {
-        stage('Checkout Source') {
-            steps {
-                git branch: 'main', url: 'https://github.com/congnam101/flask-mysql-app.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
-                }
+                echo '🚀 Building Docker image...'
+                sh 'docker build -t flask_app:latest .'
             }
         }
 
         stage('Stop Existing Containers') {
             steps {
-                script {
-                    sh "docker-compose down || true"
-                }
+                echo '🛑 Stopping existing containers...'
+                sh '''
+                    if docker compose ps -q | grep -q .; then
+                        docker compose down
+                    fi
+                '''
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                script {
-                    sh "docker-compose up -d --build"
-                }
+                echo '🚢 Deploying application...'
+                sh 'docker compose up -d'
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh "docker ps"
+                echo '✅ Checking running containers...'
+                sh 'docker ps'
             }
         }
     }
 
     post {
-        success {
-            echo '✅ Deployment completed successfully!'
-        }
         failure {
             echo '❌ Deployment failed. Check logs above.'
+        }
+        success {
+            echo '🎉 Deployment successful!'
         }
     }
 }
