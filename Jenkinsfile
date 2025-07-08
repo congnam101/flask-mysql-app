@@ -3,11 +3,11 @@ pipeline {
 
     options {
         skipDefaultCheckout(true) // Không tự động checkout từ SCM
-        cleanWs()                 // Dọn workspace đầu mỗi lần build
+        cleanWs()                 // Xóa sạch workspace trước mỗi lần build
     }
 
     environment {
-        DOCKER_BUILDKIT = 1       // Bật buildkit nếu cần
+        DOCKER_BUILDKIT = 1       // Bật BuildKit (nếu cần)
     }
 
     stages {
@@ -17,16 +17,18 @@ pipeline {
                 sh '''
                     echo "🔍 Trước khi xóa:"
                     ls -al || true
-                    
-                    echo "🧹 Xóa thư mục app nếu tồn tại..."
+
                     if [ -d "app" ]; then
-                        rm -rf app
+                        echo "🧹 Thư mục 'app' đã tồn tại. Đang xóa..."
+                        rm -rf app || true
+                        echo "✅ Đã xóa xong."
+                    else
+                        echo "ℹ️ Không có thư mục app."
                     fi
-                    
-                    echo "📥 Tiến hành clone repository..."
+
+                    echo "📥 Đang clone repository..."
                     git clone https://github.com/congnam101/flask-mysql-app.git app
-                    
-                    echo "✅ Danh sách thư mục sau khi clone:"
+                    echo "📦 Danh sách thư mục sau khi clone:"
                     ls -al app
                 '''
             }
