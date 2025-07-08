@@ -2,6 +2,12 @@ pipeline {
     agent any
 
     stages {
+        stage('List Files') {
+            steps {
+                sh 'ls -al'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo '🔧 Building Docker image...'
@@ -12,14 +18,14 @@ pipeline {
         stage('Stop Existing Containers') {
             steps {
                 echo '🛑 Stopping existing containers (if any)...'
-                sh 'docker compose down || true'
+                sh 'docker-compose down || true'
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
                 echo '🚀 Starting containers...'
-                sh 'docker compose up -d'
+                sh 'docker-compose up -d'
             }
         }
 
@@ -34,6 +40,9 @@ pipeline {
     post {
         failure {
             echo "❌ Deployment failed. Check logs above."
+        }
+        success {
+            echo "✅ Deployment successful!"
         }
     }
 }
