@@ -2,6 +2,12 @@ pipeline {
     agent any
 
     stages {
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/congnam101/flask-mysql-app.git'
+            }
+        }
+
         stage('List Files') {
             steps {
                 sh 'ls -al'
