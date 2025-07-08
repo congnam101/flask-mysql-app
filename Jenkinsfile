@@ -2,17 +2,26 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout() // Không tự động checkout code
-        cleanWs() // Dọn toàn bộ workspace đầu mỗi lần chạy
+        skipDefaultCheckout(true) // Không tự động checkout từ SCM
+        cleanWs()                 // Dọn workspace đầu mỗi lần build
+    }
+
+    environment {
+        DOCKER_BUILDKIT = 1       // Bật buildkit nếu cần
     }
 
     stages {
         stage('Clone Git Repo') {
             steps {
-                echo '📥 Cloning repo...'
-                // Xóa thư mục app nếu đã tồn tại
-                sh 'rm -rf app'
-                sh 'git clone https://github.com/congnam101/flask-mysql-app.git app'
+                echo '📥 Cloning repository...'
+                sh '''
+                    echo 🔍 Trước khi xóa:
+                    ls -al || true
+                    rm -rf app
+                    echo 🧹 Sau khi xóa:
+                    ls -al || true
+                    git clone https://github.com/congnam101/flask-mysql-app.git app
+                '''
             }
         }
 
@@ -28,7 +37,7 @@ pipeline {
         stage('Stop Existing Containers') {
             steps {
                 dir('app') {
-                    echo '🛑 Stopping containers...'
+                    echo '🛑 Stopping containers (if any)...'
                     sh 'docker-compose down || true'
                 }
             }
@@ -52,11 +61,11 @@ pipeline {
     }
 
     post {
-        failure {
-            echo '❌ Deployment Failed. Check logs above.'
-        }
         success {
             echo '✅ Deployment Successful!'
+        }
+        failure {
+            echo '❌ Deployment Failed. Check logs above.'
         }
     }
 }
