@@ -2,12 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Source') {
-            steps {
-                git 'https://github.com/congnam101/flask-mysql-app.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t flask_mysql_app_web .'
@@ -39,3 +33,4 @@ pipeline {
         }
     }
 }
+
