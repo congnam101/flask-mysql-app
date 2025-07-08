@@ -2,15 +2,16 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout()
-        cleanWs()
+        skipDefaultCheckout() // Không tự động checkout code
+        cleanWs() // Dọn toàn bộ workspace đầu mỗi lần chạy
     }
 
     stages {
         stage('Clone Git Repo') {
             steps {
                 echo '📥 Cloning repo...'
-                sh 'rm -rf app' // ✅ Dọn thư mục cũ nếu có
+                // Xóa thư mục app nếu đã tồn tại
+                sh 'rm -rf app'
                 sh 'git clone https://github.com/congnam101/flask-mysql-app.git app'
             }
         }
@@ -52,7 +53,7 @@ pipeline {
 
     post {
         failure {
-            echo '❌ Deployment Failed. Check above logs.'
+            echo '❌ Deployment Failed. Check logs above.'
         }
         success {
             echo '✅ Deployment Successful!'
