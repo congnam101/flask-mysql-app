@@ -1,69 +1,61 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_BUILDKIT = 1
-    }
-
     options {
-        // Dọn workspace trước khi build để tránh trùng file/thư mục
         skipDefaultCheckout()
         cleanWs()
     }
 
     stages {
-        stage('Checkout Source Code') {
+        stage('Clone Git Repo') {
             steps {
-                echo '🔄 Checking out source code...'
-                // Clone lại vào workspace sạch
-                checkout scm
+                echo '📥 Cloning repo...'
+                sh 'rm -rf app' // ✅ Dọn thư mục cũ nếu có
+                sh 'git clone https://github.com/congnam101/flask-mysql-app.git app'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo '🚀 Building Docker image...'
-                sh 'docker build -t flask_app:latest .'
+                dir('app') {
+                    echo '🔧 Building Docker image...'
+                    sh 'docker build -t flask_mysql_app_web .'
+                }
             }
         }
 
         stage('Stop Existing Containers') {
             steps {
-                echo '🛑 Stopping existing containers...'
-                sh '''
-                    echo "📦 Dừng container docker-compose (nếu có)..."
-                    docker-compose down --remove-orphans || echo "Không có container docker-compose nào."
-
-                    echo "🧹 Xóa container flask_web và flask_db nếu bị kẹt..."
-                    docker rm -f flask_web || true
-                    docker rm -f flask_db || true
-                '''
+                dir('app') {
+                    echo '🛑 Stopping containers...'
+                    sh 'docker-compose down || true'
+                }
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                echo '🚢 Deploying application...'
-                sh 'docker-compose up -d'
+                dir('app') {
+                    echo '🚀 Starting containers...'
+                    sh 'docker-compose up -d'
+                }
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                echo '✅ Checking running containers...'
-                sh 'docker ps'
-                echo '🔍 Trying to connect to http://localhost:5000 ...'
-                sh 'curl -f http://localhost:5000 || echo "⚠️ App chưa sẵn sàng hoặc lỗi kết nối."'
+                echo '🔍 Verifying deployment...'
+                sh 'curl -f http://localhost:5000 || echo "⚠️ App may not be ready yet."'
             }
         }
     }
 
     post {
         failure {
-            echo '❌ Deployment failed. Check logs above.'
+            echo '❌ Deployment Failed. Check above logs.'
         }
         success {
-            echo '🎉 Deployment successful!'
+            echo '✅ Deployment Successful!'
         }
     }
 }
