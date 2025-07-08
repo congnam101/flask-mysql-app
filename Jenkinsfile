@@ -15,12 +15,19 @@ pipeline {
             steps {
                 echo '📥 Cloning repository...'
                 sh '''
-                    echo 🔍 Trước khi xóa:
+                    echo "🔍 Trước khi xóa:"
                     ls -al || true
-                    rm -rf app
-                    echo 🧹 Sau khi xóa:
-                    ls -al || true
+                    
+                    echo "🧹 Xóa thư mục app nếu tồn tại..."
+                    if [ -d "app" ]; then
+                        rm -rf app
+                    fi
+                    
+                    echo "📥 Tiến hành clone repository..."
                     git clone https://github.com/congnam101/flask-mysql-app.git app
+                    
+                    echo "✅ Danh sách thư mục sau khi clone:"
+                    ls -al app
                 '''
             }
         }
